@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const fields = ['enabled', 'theme', 'overrideSelection', 'smartCopy'];
 
+    // Localize UI
+    localizeUI();
+
     // Load current settings
     chrome.storage.sync.get({
         enabled: true,
@@ -33,5 +36,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-sle-theme', theme);
+    }
+
+    function localizeUI() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) {
+                if (el.tagName === 'INPUT' && el.getAttribute('placeholder')) {
+                    el.setAttribute('placeholder', translation);
+                } else {
+                    el.textContent = translation;
+                }
+            }
+        });
     }
 });

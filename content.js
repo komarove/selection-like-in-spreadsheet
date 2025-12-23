@@ -64,20 +64,7 @@
     function createStatusBar() {
         statusBar = document.createElement('div');
         statusBar.id = 'sle-status-bar';
-        statusBar.innerHTML = `
-            <div class="sle-stat-item">
-                <span class="sle-stat-label">Average</span>
-                <span class="sle-stat-value" id="sle-avg">0</span>
-            </div>
-            <div class="sle-stat-item">
-                <span class="sle-stat-label">Count</span>
-                <span class="sle-stat-value" id="sle-count">0</span>
-            </div>
-            <div class="sle-stat-item">
-                <span class="sle-stat-label">Sum</span>
-                <span class="sle-stat-value" id="sle-sum">0</span>
-            </div>
-        `;
+        updateStats(); // Initial build with locales
         document.body.appendChild(statusBar);
     }
 
@@ -138,8 +125,6 @@
         if (settings.smartCopy && (e.ctrlKey || e.metaKey) && e.key === 'c') {
             if (selectedCells.size > 0) {
                 copySelectedToClipboard();
-                // We don't preventDefault so normal copy still works if no table cells are selected
-                // But if they are, we've overwritten the clipboard content
             }
         }
     }
@@ -147,7 +132,6 @@
     function copySelectedToClipboard() {
         if (!startCell) return;
 
-        // Group selected cells by row to maintain structure
         const rows = new Map();
         selectedCells.forEach(cell => {
             const rowIdx = cell.parentElement.rowIndex;
@@ -155,7 +139,6 @@
             rows.get(rowIdx).push(cell);
         });
 
-        // Sort rows and columns to ensure correct order in TSV
         const sortedRowIndices = Array.from(rows.keys()).sort((a, b) => a - b);
         const tsvLines = sortedRowIndices.map(rowIdx => {
             const cells = rows.get(rowIdx);
@@ -167,24 +150,21 @@
 
         const tsv = tsvLines.join('\n');
 
-        // Use a temporary textarea to copy to clipboard (modern way is navigator.clipboard)
         navigator.clipboard.writeText(tsv).then(() => {
             showCopyFeedback();
         });
     }
 
     function showCopyFeedback() {
-        const originalStatus = statusBar.innerHTML;
         const sumLabel = document.querySelector('#sle-sum').parentElement;
-        const originalSumLabel = sumLabel.innerHTML;
 
         sumLabel.innerHTML = `
-            <span class="sle-stat-label">Copied!</span>
+            <span class="sle-stat-label">${chrome.i18n.getMessage('copied') || 'Copied!'}</span>
             <span class="sle-stat-value">✓</span>
         `;
 
         setTimeout(() => {
-            updateStats(); // This will restore the labels
+            updateStats();
         }, 1500);
     }
 
@@ -256,18 +236,23 @@
 
         if (!statusBar) createStatusBar();
 
-        // Reset labels in case they were changed by "Copied!" feedback
+        const labels = {
+            average: chrome.i18n.getMessage('average') || 'Average',
+            count: chrome.i18n.getMessage('count') || 'Count',
+            sum: chrome.i18n.getMessage('sum') || 'Sum'
+        };
+
         statusBar.innerHTML = `
             <div class="sle-stat-item">
-                <span class="sle-stat-label">Average</span>
+                <span class="sle-stat-label">${labels.average}</span>
                 <span class="sle-stat-value" id="sle-avg">0</span>
             </div>
             <div class="sle-stat-item">
-                <span class="sle-stat-label">Count</span>
+                <span class="sle-stat-label">${labels.count}</span>
                 <span class="sle-stat-value" id="sle-count">0</span>
             </div>
             <div class="sle-stat-item">
-                <span class="sle-stat-label">Sum</span>
+                <span class="sle-stat-label">${labels.sum}</span>
                 <span class="sle-stat-value" id="sle-sum">0</span>
             </div>
         `;

@@ -1,0 +1,41 @@
+{
+    "extensionName": {
+        "message": "Select Like Excel"
+    },
+    "extensionDescription": {
+        "message": "Выделяйте ячейки таблиц как в Excel и видите сумму/среднее/количество."
+    },
+    "enableExtension": {
+        "message": "Включить расширение"
+    },
+    "theme": {
+        "message": "Тема"
+    },
+    "themeAuto": {
+        "message": "Авто (Системная)"
+    },
+    "themeLight": {
+        "message": "Светлая"
+    },
+    "themeDark": {
+        "message": "Темная"
+    },
+    "overrideSelection": {
+        "message": "Блокировать выделение"
+    },
+    "smartCopy": {
+        "message": "Умное копирование (Ctrl+C)"
+    },
+    "average": {
+        "message": "Среднее"
+    },
+    "count": {
+        "message": "Кол-во"
+    },
+    "sum": {
+        "message": "Сумма"
+    },
+    "copied": {
+        "message": "Скопировано!"
+    }
+}

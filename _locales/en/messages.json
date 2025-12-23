@@ -1,0 +1,41 @@
+{
+    "extensionName": {
+        "message": "Select Like Excel"
+    },
+    "extensionDescription": {
+        "message": "Select table cells like Excel and see the sum/average/count."
+    },
+    "enableExtension": {
+        "message": "Enable Extension"
+    },
+    "theme": {
+        "message": "Theme"
+    },
+    "themeAuto": {
+        "message": "Auto (System)"
+    },
+    "themeLight": {
+        "message": "Light"
+    },
+    "themeDark": {
+        "message": "Dark"
+    },
+    "overrideSelection": {
+        "message": "Override Selection"
+    },
+    "smartCopy": {
+        "message": "Smart Copy (Ctrl+C)"
+    },
+    "average": {
+        "message": "Average"
+    },
+    "count": {
+        "message": "Count"
+    },
+    "sum": {
+        "message": "Sum"
+    },
+    "copied": {
+        "message": "Copied!"
+    }
+}
