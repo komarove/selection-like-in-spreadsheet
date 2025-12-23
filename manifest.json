@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Select Like Excel",
+  "name": "__MSG_extensionName__",
   "version": "1.0.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
@@ -22,7 +22,7 @@
     }
   ],
   "action": {
-    "default_title": "Select Like Excel",
+    "default_title": "__MSG_extensionName__",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

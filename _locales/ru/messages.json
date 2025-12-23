@@ -1,6 +1,6 @@
 {
     "extensionName": {
-        "message": "Select Like Excel"
+        "message": "Выделение как в Spreadsheet"
     },
     "extensionDescription": {
         "message": "Выделяйте ячейки таблиц как в Excel и видите сумму/среднее/количество."

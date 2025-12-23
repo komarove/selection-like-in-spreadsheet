@@ -1,4 +1,4 @@
-# Select Like Excel
+# Selection like in Spreadsheet
 
 A browser extension that allows you to select HTML table cells with mouse-dragging (exactly like in Microsoft Excel) and see instant calculations in a sleek status bar.
 

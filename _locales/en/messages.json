@@ -1,6 +1,6 @@
 {
     "extensionName": {
-        "message": "Select Like Excel"
+        "message": "Selection like in Spreadsheet"
     },
     "extensionDescription": {
         "message": "Select table cells like Excel and see the sum/average/count."
