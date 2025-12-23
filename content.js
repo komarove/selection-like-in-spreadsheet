@@ -107,7 +107,9 @@
         isSelecting = true;
         startCell = info;
 
-        clearSelection();
+        if (!(e.ctrlKey || e.metaKey)) {
+            clearSelection();
+        }
         addCellToSelection(info.element);
 
         if (settings.overrideSelection) {
@@ -121,7 +123,7 @@
         const currentCell = getCellInfo(e.target);
         if (!currentCell || currentCell.table !== startCell.table) return;
 
-        updateSelectionRange(startCell, currentCell);
+        updateSelectionRange(startCell, currentCell, (e.ctrlKey || e.metaKey));
     }
 
     function handleMouseUp() {
@@ -186,10 +188,14 @@
         }, 1500);
     }
 
-    function updateSelectionRange(start, end) {
-        clearSelectionStyles();
+    function updateSelectionRange(start, end, additive = false) {
+        if (!additive) {
+            clearSelectionStyles();
+        }
         const prevSize = selectedCells.size;
-        selectedCells.clear();
+        if (!additive) {
+            selectedCells.clear();
+        }
 
         const table = start.table;
         const minRow = Math.min(start.rowIndex, end.rowIndex);
