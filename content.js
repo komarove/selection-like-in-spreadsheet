@@ -1,14 +1,64 @@
-(function() {
+(function () {
     let isSelecting = false;
     let startCell = null;
     let selectedCells = new Set();
     let statusBar = null;
+    let settings = {
+        enabled: true,
+        theme: 'auto',
+        overrideSelection: true,
+        smartCopy: true
+    };
 
     function init() {
-        createStatusBar();
+        // Load initial settings
+        chrome.storage.sync.get(settings, (loadedSettings) => {
+            Object.assign(settings, loadedSettings);
+            if (settings.enabled) {
+                setupExtension();
+            }
+            applyTheme();
+        });
+
+        // Listen for setting changes
+        chrome.storage.onChanged.addListener((changes) => {
+            let needsReSetup = false;
+            for (let [key, { newValue }] of Object.entries(changes)) {
+                settings[key] = newValue;
+                if (key === 'enabled') needsReSetup = true;
+                if (key === 'theme') applyTheme();
+            }
+
+            if (needsReSetup) {
+                if (settings.enabled) {
+                    setupExtension();
+                } else {
+                    disableExtension();
+                }
+            }
+        });
+    }
+
+    function setupExtension() {
+        if (!statusBar) createStatusBar();
         document.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('keydown', handleKeyDown);
+    }
+
+    function disableExtension() {
+        clearSelection();
+        if (statusBar) statusBar.classList.remove('visible');
+        document.removeEventListener('mousedown', handleMouseDown);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('keydown', handleKeyDown);
+        document.body.classList.remove('sle-no-select');
+    }
+
+    function applyTheme() {
+        document.documentElement.setAttribute('data-sle-theme', settings.theme);
     }
 
     function createStatusBar() {
@@ -47,19 +97,22 @@
     }
 
     function handleMouseDown(e) {
+        if (!settings.enabled) return;
         const info = getCellInfo(e.target);
         if (!info) {
             clearSelection();
             return;
         }
 
-        // Check if we are already selecting or if it's a new selection
         isSelecting = true;
         startCell = info;
-        
-        // Clear previous selection unless Shift is held (advanced feature, keeping it simple for now)
+
         clearSelection();
         addCellToSelection(info.element);
+
+        if (settings.overrideSelection) {
+            document.body.classList.add('sle-no-select');
+        }
     }
 
     function handleMouseMove(e) {
@@ -75,11 +128,67 @@
         if (isSelecting) {
             isSelecting = false;
             updateStats();
+            document.body.classList.remove('sle-no-select');
         }
+    }
+
+    function handleKeyDown(e) {
+        if (settings.smartCopy && (e.ctrlKey || e.metaKey) && e.key === 'c') {
+            if (selectedCells.size > 0) {
+                copySelectedToClipboard();
+                // We don't preventDefault so normal copy still works if no table cells are selected
+                // But if they are, we've overwritten the clipboard content
+            }
+        }
+    }
+
+    function copySelectedToClipboard() {
+        if (!startCell) return;
+
+        // Group selected cells by row to maintain structure
+        const rows = new Map();
+        selectedCells.forEach(cell => {
+            const rowIdx = cell.parentElement.rowIndex;
+            if (!rows.has(rowIdx)) rows.set(rowIdx, []);
+            rows.get(rowIdx).push(cell);
+        });
+
+        // Sort rows and columns to ensure correct order in TSV
+        const sortedRowIndices = Array.from(rows.keys()).sort((a, b) => a - b);
+        const tsvLines = sortedRowIndices.map(rowIdx => {
+            const cells = rows.get(rowIdx);
+            return cells
+                .sort((a, b) => a.cellIndex - b.cellIndex)
+                .map(c => c.textContent.trim())
+                .join('\t');
+        });
+
+        const tsv = tsvLines.join('\n');
+
+        // Use a temporary textarea to copy to clipboard (modern way is navigator.clipboard)
+        navigator.clipboard.writeText(tsv).then(() => {
+            showCopyFeedback();
+        });
+    }
+
+    function showCopyFeedback() {
+        const originalStatus = statusBar.innerHTML;
+        const sumLabel = document.querySelector('#sle-sum').parentElement;
+        const originalSumLabel = sumLabel.innerHTML;
+
+        sumLabel.innerHTML = `
+            <span class="sle-stat-label">Copied!</span>
+            <span class="sle-stat-value">✓</span>
+        `;
+
+        setTimeout(() => {
+            updateStats(); // This will restore the labels
+        }, 1500);
     }
 
     function updateSelectionRange(start, end) {
         clearSelectionStyles();
+        const prevSize = selectedCells.size;
         selectedCells.clear();
 
         const table = start.table;
@@ -98,7 +207,10 @@
                 }
             }
         }
-        updateStats();
+
+        if (selectedCells.size !== prevSize) {
+            updateStats();
+        }
     }
 
     function addCellToSelection(cell) {
@@ -128,13 +240,31 @@
         });
 
         if (numbers.length === 0) {
-            statusBar.classList.remove('visible');
+            if (statusBar) statusBar.classList.remove('visible');
             return;
         }
 
         const sum = numbers.reduce((a, b) => a + b, 0);
         const avg = sum / numbers.length;
         const count = numbers.length;
+
+        if (!statusBar) createStatusBar();
+
+        // Reset labels in case they were changed by "Copied!" feedback
+        statusBar.innerHTML = `
+            <div class="sle-stat-item">
+                <span class="sle-stat-label">Average</span>
+                <span class="sle-stat-value" id="sle-avg">0</span>
+            </div>
+            <div class="sle-stat-item">
+                <span class="sle-stat-label">Count</span>
+                <span class="sle-stat-value" id="sle-count">0</span>
+            </div>
+            <div class="sle-stat-item">
+                <span class="sle-stat-label">Sum</span>
+                <span class="sle-stat-value" id="sle-sum">0</span>
+            </div>
+        `;
 
         document.getElementById('sle-sum').textContent = formatNumber(sum);
         document.getElementById('sle-avg').textContent = formatNumber(avg);
@@ -144,27 +274,18 @@
     }
 
     function parseNumber(text) {
-        // Remove whitespace, currency symbols, and handle commas
         let clean = text.replace(/[^\d.-]/g, '');
         if (clean === '' || clean === '-') return null;
-        
-        // Handle cases like "1,234.56" vs "1.234,56"
-        // This is a bit tricky, simple approach for now:
-        // If there's a comma AND a dot, assume comma is thousands separator
-        // If just a comma, could be decimal or thousands. 
-        // We'll try to be smart:
+
         if (text.includes(',') && text.includes('.')) {
             clean = text.replace(/,/g, '');
         } else if (text.includes(',')) {
-            // Check if comma is followed by 3 digits (likely thousands)
             const parts = text.split(',');
             if (parts[parts.length - 1].length === 3) {
                 clean = text.replace(/,/g, '');
             } else {
                 clean = text.replace(/,/g, '.');
             }
-        } else {
-            clean = text;
         }
 
         const num = parseFloat(clean);
@@ -176,10 +297,5 @@
         return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
 
-    // Run init
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    init();
 })();
