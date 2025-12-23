@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const fields = ['enabled', 'theme', 'overrideSelection', 'smartCopy'];
+    const fields = ['enabled', 'theme', 'overrideSelection', 'smartCopy', 'strictMode'];
 
     // Localize UI
     localizeUI();
@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         enabled: true,
         theme: 'auto',
         overrideSelection: true,
-        smartCopy: true
+        smartCopy: true,
+        strictMode: false
     }, (settings) => {
         fields.forEach(field => {
             const el = document.getElementById(field);

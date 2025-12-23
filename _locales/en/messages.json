@@ -8,6 +8,9 @@
     "enableExtension": {
         "message": "Enable Extension"
     },
+    "strictMode": {
+        "message": "Strict Mode"
+    },
     "theme": {
         "message": "Theme"
     },

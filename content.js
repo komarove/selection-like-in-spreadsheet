@@ -7,7 +7,8 @@
         enabled: true,
         theme: 'auto',
         overrideSelection: true,
-        smartCopy: true
+        smartCopy: true,
+        strictMode: false
     };
 
     function init() {
@@ -204,7 +205,13 @@
     }
 
     function addCellToSelection(cell) {
-        cell.classList.add('sle-selected');
+        const val = parseNumber(cell.textContent, settings.strictMode);
+        const hasNumber = val !== null;
+        if (hasNumber) {
+            cell.classList.add('sle-selected');
+        } else {
+            cell.classList.add('sle-selected-text');
+        }
         selectedCells.add(cell);
     }
 
@@ -215,15 +222,15 @@
     }
 
     function clearSelectionStyles() {
-        document.querySelectorAll('.sle-selected').forEach(el => {
-            el.classList.remove('sle-selected');
+        document.querySelectorAll('.sle-selected, .sle-selected-text').forEach(el => {
+            el.classList.remove('sle-selected', 'sle-selected-text');
         });
     }
 
     function updateStats() {
         const numbers = [];
         selectedCells.forEach(cell => {
-            const val = parseNumber(cell.textContent);
+            const val = parseNumber(cell.textContent, settings.strictMode);
             if (val !== null) {
                 numbers.push(val);
             }
@@ -268,7 +275,20 @@
         statusBar.classList.add('visible');
     }
 
-    function parseNumber(text) {
+    function parseNumber(text, strict = false) {
+        if (strict) {
+            // Remove whitespace and check if it's a pure number
+            const trimmed = text.trim();
+            // Match integers or floats (with . or , as decimal separator)
+            // But only if there are no other characters
+            if (/^-?\d+([.,]\d+)?$/.test(trimmed)) {
+                const clean = trimmed.replace(',', '.');
+                const num = parseFloat(clean);
+                return isNaN(num) ? null : num;
+            }
+            return null;
+        }
+
         let clean = text.replace(/[^\d.-]/g, '');
         if (clean === '' || clean === '-') return null;
 

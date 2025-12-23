@@ -8,6 +8,9 @@
     "enableExtension": {
         "message": "Включить расширение"
     },
+    "strictMode": {
+        "message": "Строгий режим"
+    },
     "theme": {
         "message": "Тема"
     },
