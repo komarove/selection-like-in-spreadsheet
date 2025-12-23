@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Select Like Excel",
+  "version": "1.0",
+  "description": "Select table cells like Excel and see the sum/average/count.",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "action": {
+    "default_title": "Select Like Excel"
+  }
+}
