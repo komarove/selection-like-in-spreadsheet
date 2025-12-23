@@ -4,13 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <style>
+        :root {
+            --sle-bg: #ffffff;
+            --sle-text: #333333;
+            --sle-label: #555555;
+            --sle-border: #eeeeee;
+            --sle-input-bg: #ffffff;
+            --sle-input-border: #dddddd;
+            --sle-slider-bg: #cccccc;
+        }
+
+        [data-sle-theme="dark"] {
+            --sle-bg: #1e1e1e;
+            --sle-text: #eeeeee;
+            --sle-label: #aaaaaa;
+            --sle-border: #333333;
+            --sle-input-bg: #2d2d2d;
+            --sle-input-border: #444444;
+            --sle-slider-bg: #555555;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            [data-sle-theme="auto"] {
+                --sle-bg: #1e1e1e;
+                --sle-text: #eeeeee;
+                --sle-label: #aaaaaa;
+                --sle-border: #333333;
+                --sle-input-bg: #2d2d2d;
+                --sle-input-border: #444444;
+                --sle-slider-bg: #555555;
+            }
+        }
+
         body {
             width: 250px;
             padding: 16px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            background: #fff;
-            color: #333;
+            background: var(--sle-bg);
+            color: var(--sle-text);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         h2 {
@@ -31,6 +64,7 @@
 
         .setting-label {
             font-weight: 500;
+            color: var(--sle-text);
         }
 
         /* Switch styling */
@@ -54,7 +88,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: var(--sle-slider-bg);
             transition: .4s;
             border-radius: 20px;
         }
@@ -82,7 +116,9 @@
         select {
             padding: 4px 8px;
             border-radius: 4px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--sle-input-border);
+            background: var(--sle-input-bg);
+            color: var(--sle-text);
             font-size: 12px;
             outline: none;
         }
@@ -90,10 +126,14 @@
         .footer {
             margin-top: 16px;
             padding-top: 12px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--sle-border);
             font-size: 11px;
-            color: #888;
+            color: var(--sle-label);
             text-align: center;
+        }
+
+        .footer a {
+            color: var(--sle-text);
         }
     </style>
 </head>
@@ -135,7 +175,7 @@
     </div>
 
     <div class="footer">
-        v1.1 - Excel Selection Tool
+        v1.1 - <a href="https://google.com" target="_blank">Excel Selection Tool</a>
     </div>
 
     <script src="popup.js"></script>

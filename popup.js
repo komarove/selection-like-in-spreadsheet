@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.value = settings[field];
             }
         });
+        applyTheme(settings.theme);
     });
 
     // Save on change
@@ -24,6 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('change', () => {
             const value = el.type === 'checkbox' ? el.checked : el.value;
             chrome.storage.sync.set({ [field]: value });
+            if (field === 'theme') {
+                applyTheme(value);
+            }
         });
     });
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-sle-theme', theme);
+    }
 });
