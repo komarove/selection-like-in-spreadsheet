@@ -1,0 +1,19 @@
+# Extensions
+*.crx
+*.xpi
+*.pem
+
+# OS extracted files
+.DS_Store
+Thumbs.db
+
+# Project local files
+test.html
+
+# IDE folders
+.idea/
+.vscode/
+
+# Build/Dist (if used later)
+dist/
+node_modules/
