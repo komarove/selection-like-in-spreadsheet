@@ -1,15 +1,17 @@
 {
   "manifest_version": 3,
   "name": "Select Like Excel",
-  "version": "1.0",
-  "description": "Select table cells like Excel and see the sum/average/count.",
+  "version": "1.0.0",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "permissions": [
     "storage"
   ],
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "http://*/*",
+        "https://*/*"
       ],
       "js": [
         "content.js"
