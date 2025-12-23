@@ -52,10 +52,16 @@
         chrome.storage.onChanged.addListener((changes) => {
             if (isOrphaned()) return;
             let needsReSetup = false;
+            let needsClear = false;
             for (let [key, { newValue }] of Object.entries(changes)) {
                 settings[key] = newValue;
                 if (key === 'enabled') needsReSetup = true;
                 if (key === 'theme') applyTheme();
+                if (key === 'strictMode') needsClear = true;
+            }
+
+            if (needsClear) {
+                clearSelection();
             }
 
             if (needsReSetup) {
