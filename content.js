@@ -156,7 +156,11 @@
     }
 
     function showCopyFeedback() {
-        const sumLabel = document.querySelector('#sle-sum').parentElement;
+        const sumElement = document.querySelector('#sle-sum');
+        if (!sumElement) return;
+
+        const sumLabel = sumElement.parentElement;
+        if (!sumLabel) return;
 
         sumLabel.innerHTML = `
             <span class="sle-stat-label">${chrome.i18n.getMessage('copied') || 'Copied!'}</span>
