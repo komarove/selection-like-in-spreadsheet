@@ -11,8 +11,34 @@
         strictMode: false
     };
 
+    const locales = {
+        average: 'Average',
+        count: 'Count',
+        sum: 'Sum',
+        copied: 'Copied!'
+    };
+
+    function isOrphaned() {
+        return typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.id;
+    }
+
+    function loadLocales() {
+        try {
+            if (!isOrphaned()) {
+                ['average', 'count', 'sum', 'copied'].forEach(key => {
+                    const msg = chrome.i18n.getMessage(key);
+                    if (msg) locales[key] = msg;
+                });
+            }
+        } catch (e) {
+            // Context invalidated
+        }
+    }
+
     function init() {
+        loadLocales();
         // Load initial settings
+        if (isOrphaned()) return;
         chrome.storage.sync.get(settings, (loadedSettings) => {
             Object.assign(settings, loadedSettings);
             if (settings.enabled) {
@@ -22,7 +48,9 @@
         });
 
         // Listen for setting changes
+        if (isOrphaned()) return;
         chrome.storage.onChanged.addListener((changes) => {
+            if (isOrphaned()) return;
             let needsReSetup = false;
             for (let [key, { newValue }] of Object.entries(changes)) {
                 settings[key] = newValue;
@@ -85,7 +113,7 @@
     }
 
     function handleMouseDown(e) {
-        if (!settings.enabled) return;
+        if (isOrphaned() || !settings.enabled) return;
         const info = getCellInfo(e.target);
         if (!info) {
             clearSelection();
@@ -123,10 +151,9 @@
     }
 
     function handleKeyDown(e) {
-        if (settings.smartCopy && (e.ctrlKey || e.metaKey) && e.key === 'c') {
-            if (selectedCells.size > 0) {
-                copySelectedToClipboard();
-            }
+        if (isOrphaned() || !settings.smartCopy || !(e.ctrlKey || e.metaKey) || e.key !== 'c') return;
+        if (selectedCells.size > 0) {
+            copySelectedToClipboard();
         }
     }
 
@@ -164,7 +191,7 @@
         if (!sumLabel) return;
 
         sumLabel.innerHTML = `
-            <span class="sle-stat-label">${chrome.i18n.getMessage('copied') || 'Copied!'}</span>
+            <span class="sle-stat-label">${locales.copied}</span>
             <span class="sle-stat-value">✓</span>
         `;
 
@@ -247,11 +274,7 @@
 
         if (!statusBar) createStatusBar();
 
-        const labels = {
-            average: chrome.i18n.getMessage('average') || 'Average',
-            count: chrome.i18n.getMessage('count') || 'Count',
-            sum: chrome.i18n.getMessage('sum') || 'Sum'
-        };
+        const labels = locales;
 
         statusBar.innerHTML = `
             <div class="sle-stat-item">
