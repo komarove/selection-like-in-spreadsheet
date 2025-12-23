@@ -120,6 +120,14 @@
 
     function handleMouseDown(e) {
         if (isOrphaned() || !settings.enabled) return;
+
+        if (e.button === 2) { // Right click
+            if (isSelecting) {
+                handleMouseUp();
+            }
+            return;
+        }
+
         const info = getCellInfo(e.target);
         if (!info) {
             clearSelection();
