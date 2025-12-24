@@ -1,9 +1,9 @@
 {
     "extensionName": {
-        "message": "Выделение как в Spreadsheet"
+        "message": "Выделите ячейки, как в Spreadsheet"
     },
     "extensionDescription": {
-        "message": "Выделяйте ячейки таблиц как в Excel и видите сумму/среднее/количество."
+        "message": "Выделяйте ячейки в таблицах, как в Excel, — и сразу увидите сумму, среднее значение или количество."
     },
     "enableExtension": {
         "message": "Включить расширение"
