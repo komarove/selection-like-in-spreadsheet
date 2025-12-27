@@ -15,6 +15,10 @@ A browser extension that allows you to select HTML table cells with mouse-draggi
 
 ## Installation
 
+Download from [Chrome Web Store](https://chromewebstore.google.com/detail/select-cells-like-in-a-sp/mbgfjfbmbhofiofdonallpigcjaokgkj?hl=en)
+
+Or install manual:
+
 1. Clone or download this repository.
 2. Open Chrome and navigate to `chrome://extensions/`.
 3. Enable **Developer mode** in the top-right corner.
